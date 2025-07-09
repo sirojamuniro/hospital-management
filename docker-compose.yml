@@ -1,0 +1,32 @@
+services:
+  web:
+    image: odoo:16.0
+    depends_on:
+      - db
+    ports:
+      - 9001:8069
+    volumes:
+      - ./config:/etc/odoo
+      - ./addons:/mnt/extra-addons
+      - ./logs:/var/log/odoo # 💡 mount log folder
+      - odoo-data:/var/lib/odoo
+    environment:
+      - PGHOST=db
+      - PGUSER=odoo
+      - PGPASSWORD=odoo
+    command: odoo -c /etc/odoo/odoo.conf
+    restart: unless-stopped
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_DB=postgres
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  odoo-data:
+  pg-data:
